@@ -1,5 +1,5 @@
 const { v4: uuidv4 } = require("uuid");
-const { passwordEncryption } = require("../src/utils/passwordEncryption");
+const { dataEncryption } = require("../src/utils/dataEncryption");
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
@@ -8,7 +8,7 @@ module.exports = {
     );
 
     if (!existing[0].length) {
-      const password = await passwordEncryption("Admin@123");
+      const password = await dataEncryption("Admin@123");
 
       await queryInterface.bulkInsert("users", [
         {
