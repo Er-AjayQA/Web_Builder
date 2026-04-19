@@ -3,7 +3,10 @@
    ==================================== */
 const db = require("../../../../config/index");
 const { passwordEncryption } = require("../../../../utils/passwordEncryption");
+const { sendMail } = require("../../../../utils/mailer");
+const { generateOtp } = require("../../../../utils/otpGenerator");
 const UsersModel = db.UsersModel;
+const OtpsModel = db.OtpsModel;
 
 /* ====================================
             Controllers
@@ -25,18 +28,26 @@ exports.user_registration = async (req, res, next) => {
       return res.conflict("User already exists with this email");
     }
 
+    let otp = generateOtp();
+
     const hashedPassword = await passwordEncryption(password);
     const user = await UsersModel.create({
       name,
       email: normalizedEmail,
       password: hashedPassword,
       role,
+      is_verified: false,
     });
 
-    const userData = user.toJSON();
-    delete userData.password;
+    const saveOtp = await OtpsModel.create({
+      user_id: user.id,
+      otp,
+      otpExpiry: new Date(Date.now() + 5 * 60 * 1000),
+    });
 
-    return res.created("User created successfully", userData);
+    await sendMail(email, "OTP Verification", `Your OTP is ${otp}`);
+
+    return res.ok("OTP sent successfully", otp);
   } catch (error) {
     next(error);
   }

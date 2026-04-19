@@ -1,5 +1,5 @@
 const { v4: uuidv4 } = require("uuid");
-const { passwordEncryption } = require("../utils/passwordEncryption");
+const { passwordEncryption } = require("../src/utils/passwordEncryption");
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
@@ -19,6 +19,7 @@ module.exports = {
           role: "super_admin",
           status: "ACTIVE",
           is_deleted: false,
+          is_verified: true,
           created_at: new Date(),
           updated_at: new Date(),
         },
